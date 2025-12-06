@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Just Drift - Display</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div id="game-container">
+    <canvas id="gameCanvas"></canvas>
+    
+    <!-- Title Screen Overlay -->
+    <div id="title-screen" class="overlay">
+      <h1 class="game-title">JUST DRIFT</h1>
+      <p class="tagline">OUTRUN THE COPS. DRIFT TO SURVIVE.</p>
+      <div class="car-preview"></div>
+      <p class="waiting-text">Creating room...</p>
+    </div>
+    
+    <!-- Waiting for Controller Overlay -->
+    <div id="waiting-screen" class="overlay hidden">
+      <h2>WAITING FOR CONTROLLER</h2>
+      <div class="room-code-container">
+        <p>ROOM CODE</p>
+        <div id="room-code" class="room-code">----</div>
+      </div>
+      <p class="instruction">Open on your phone:</p>
+      <p class="url" id="controller-url"></p>
+      <div id="qr-code"></div>
+    </div>
+    
+    <!-- Ready Screen Overlay -->
+    <div id="ready-screen" class="overlay hidden">
+      <h1 class="ready-title">CONTROLLER CONNECTED!</h1>
+      <div class="car-preview"></div>
+      <p class="ready-text">ARE YOU READY?</p>
+      
+      <!-- Arcade Start Button -->
+      <div class="arcade-start-container">
+        <div class="arcade-start-btn">
+          <div class="arcade-btn-glow"></div>
+          <div class="arcade-btn-inner">
+            <span class="arcade-btn-icon">▶</span>
+            <span class="arcade-btn-text">START</span>
+          </div>
+        </div>
+        <p class="ready-hint">TAP FIRE ON CONTROLLER</p>
+      </div>
+    </div>
+    
+    <!-- Game Over Overlay -->
+    <div id="gameover-screen" class="overlay hidden">
+      <h1 class="caught-text">CAUGHT!</h1>
+      <div class="final-stats">
+        <p>TIME: <span id="final-time">0:00</span></p>
+        <p>SCORE: <span id="final-score">0</span></p>
+      </div>
+      <button id="retry-btn" class="retry-btn">🔄 RETRY</button>
+      <p class="retry-hint">or tap FIRE on controller</p>
+    </div>
+    
+    <!-- Pause Overlay -->
+    <div id="pause-screen" class="overlay hidden">
+      <h1 class="pause-title">PAUSED</h1>
+      <div class="pause-menu">
+        <button id="resume-btn" class="pause-btn">▶ RESUME</button>
+        <a href="/" class="pause-btn">🏠 HOME</a>
+      </div>
+      <p class="pause-hint">Press PAUSE on controller to resume</p>
+    </div>
+    
+    <!-- HUD -->
+    <div id="hud" class="hidden">
+      <div class="hud-left">
+        <div class="hud-item">
+          <span class="hud-label">SCORE</span>
+          <span id="score" class="hud-value">0</span>
+        </div>
+        <div class="hud-item">
+          <span class="hud-label">TIME</span>
+          <span id="time" class="hud-value">0:00</span>
+        </div>
+      </div>
+      <div class="hud-right">
+        <div class="hud-item">
+          <span class="hud-label">NITRO</span>
+          <div class="nitro-bar-display">
+            <div id="nitro-fill-display" class="nitro-fill-display"></div>
+          </div>
+        </div>
+        <div class="hud-item">
+          <span class="hud-label">AMMO</span>
+          <span id="ammo" class="hud-value ammo-value">5</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.3/build/qrcode.min.js"></script>
+  <script src="/socket.io/socket.io.js"></script>
+  <script src="game.js"></script>
+</body>
+</html>

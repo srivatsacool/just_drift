@@ -1,0 +1,25 @@
+{
+  "name": "just-drift",
+  "version": "1.0.0",
+  "description": "Top-down 8-bit arcade chase game - Outrun the cops, drift to survive!",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js"
+  },
+  "keywords": [
+    "game",
+    "arcade",
+    "8-bit",
+    "drift",
+    "socket.io",
+    "multiplayer"
+  ],
+  "author": "Build.Srivatsa",
+  "license": "MIT",
+  "dependencies": {
+    "express": "^4.18.2",
+    "socket.io": "^4.7.2",
+    "cors": "^2.8.5"
+  }
+}

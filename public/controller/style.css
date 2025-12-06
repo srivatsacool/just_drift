@@ -1,0 +1,545 @@
+/* ========================================
+   JUST DRIFT - Controller Styles
+   Mobile-first arcade controller UI
+   New Layout: LEFT | NITRO+GUN | RIGHT
+======================================== */
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    -webkit-tap-highlight-color: transparent;
+    touch-action: manipulation;
+}
+
+html,
+body {
+    height: 100%;
+    overflow: hidden;
+}
+
+body {
+    background: linear-gradient(180deg, #0a0a0f 0%, #1a1a2e 100%);
+    font-family: 'Press Start 2P', cursive;
+    color: #ffffff;
+    user-select: none;
+    -webkit-user-select: none;
+}
+
+#app {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+/* ========================================
+   Screens
+======================================== */
+
+.screen {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-between;
+    padding: 20px 15px;
+}
+
+.screen.hidden {
+    display: none;
+}
+
+/* ========================================
+   Header
+======================================== */
+
+.header {
+    text-align: center;
+    padding-top: 20px;
+}
+
+.header h1 {
+    font-size: 1.8rem;
+    color: #e63946;
+    text-shadow: 3px 3px 0 #000;
+    margin-bottom: 10px;
+}
+
+.header .subtitle {
+    font-size: 0.7rem;
+    color: #ffd166;
+}
+
+/* ========================================
+   Join Screen
+======================================== */
+
+.join-form {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 20px;
+    width: 100%;
+    max-width: 300px;
+}
+
+.join-form label {
+    font-size: 0.6rem;
+    color: #888;
+}
+
+.join-form input {
+    width: 200px;
+    padding: 20px;
+    font-family: 'Press Start 2P', cursive;
+    font-size: 1.8rem;
+    text-align: center;
+    letter-spacing: 10px;
+    background: #1a1a2e;
+    border: 3px solid #4ecdc4;
+    color: #ffd166;
+    border-radius: 8px;
+    outline: none;
+}
+
+.join-form input::placeholder {
+    color: #333;
+}
+
+.join-form input:focus {
+    border-color: #ffd166;
+    box-shadow: 0 0 20px rgba(255, 209, 102, 0.3);
+}
+
+.btn-primary {
+    padding: 18px 40px;
+    font-family: 'Press Start 2P', cursive;
+    font-size: 0.9rem;
+    background: linear-gradient(180deg, #4ecdc4 0%, #26a69a 100%);
+    color: #000;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    box-shadow: 0 4px 0 #1a7a6f, 0 6px 10px rgba(0, 0, 0, 0.3);
+    transition: transform 0.1s, box-shadow 0.1s;
+}
+
+.btn-primary:active {
+    transform: translateY(4px);
+    box-shadow: 0 0 0 #1a7a6f, 0 2px 5px rgba(0, 0, 0, 0.3);
+}
+
+.error {
+    font-size: 0.5rem;
+    color: #e63946;
+    text-align: center;
+}
+
+.error.hidden {
+    display: none;
+}
+
+.car-icon {
+    width: 50px;
+    height: 80px;
+    background: #ffd166;
+    clip-path: polygon(20% 0%, 80% 0%, 90% 15%, 90% 85%, 80% 100%, 20% 100%, 10% 85%, 10% 15%);
+    opacity: 0.3;
+}
+
+/* ========================================
+   Waiting Screen
+======================================== */
+
+.waiting-animation {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 30px;
+}
+
+.waiting-animation p {
+    font-size: 0.6rem;
+    color: #888;
+    animation: blink 1s infinite;
+}
+
+@keyframes blink {
+
+    0%,
+    50% {
+        opacity: 1;
+    }
+
+    51%,
+    100% {
+        opacity: 0.3;
+    }
+}
+
+.spinner {
+    width: 60px;
+    height: 60px;
+    border: 4px solid #333;
+    border-top: 4px solid #4ecdc4;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    0% {
+        transform: rotate(0deg);
+    }
+
+    100% {
+        transform: rotate(360deg);
+    }
+}
+
+/* ========================================
+   Controller Screen - 3-Column Layout
+======================================== */
+
+.controller-layout {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+.controller-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 15px;
+    gap: 10px;
+}
+
+.status {
+    font-size: 0.45rem;
+    padding: 6px 12px;
+    border-radius: 15px;
+    background: #1a1a2e;
+}
+
+.status.connected {
+    color: #4ecdc4;
+    border: 2px solid #4ecdc4;
+}
+
+.status.disconnected {
+    color: #e63946;
+    border: 2px solid #e63946;
+}
+
+/* Pause Button */
+.pause-btn {
+    width: 40px;
+    height: 40px;
+    font-size: 1.2rem;
+    background: linear-gradient(180deg, #3d3d5c 0%, #2d2d3a 100%);
+    border: 2px solid #4a4a5a;
+    border-radius: 8px;
+    color: #fff;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 3px 0 #1a1a2e;
+    transition: all 0.1s;
+}
+
+.pause-btn:active {
+    transform: translateY(3px);
+    box-shadow: 0 0 0 #1a1a2e;
+}
+
+/* Ammo Display */
+.ammo-display {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2px;
+}
+
+.ammo-label {
+    font-size: 0.4rem;
+    color: #888;
+}
+
+.ammo-value {
+    font-size: 0.8rem;
+    color: #ff6b6b;
+    text-shadow: 0 0 10px rgba(255, 107, 107, 0.5);
+}
+
+/* Nitro Bar */
+.nitro-display {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+}
+
+.nitro-label {
+    font-size: 0.4rem;
+    color: #888;
+}
+
+.nitro-bar {
+    width: 60px;
+    height: 12px;
+    background: #1a1a2e;
+    border: 2px solid #4ecdc4;
+    border-radius: 6px;
+    overflow: hidden;
+}
+
+.nitro-fill {
+    height: 100%;
+    width: 100%;
+    background: linear-gradient(90deg, #4ecdc4 0%, #00ff88 100%);
+    transition: width 0.2s;
+}
+
+/* Main Controls - 3 Columns */
+.main-controls {
+    flex: 1;
+    display: flex;
+    gap: 10px;
+    padding: 10px;
+}
+
+.control-column {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 15px;
+}
+
+.left-column,
+.right-column {
+    flex: 1;
+}
+
+.center-column {
+    flex: 1.2;
+    justify-content: space-around;
+    padding: 20px 0;
+}
+
+/* Control Buttons */
+.control-btn {
+    width: 100%;
+    font-family: 'Press Start 2P', cursive;
+    border: none;
+    border-radius: 12px;
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    transition: transform 0.05s, box-shadow 0.05s;
+}
+
+.btn-icon {
+    font-size: 2rem;
+}
+
+.btn-label {
+    font-size: 0.6rem;
+}
+
+/* Steering Buttons (LEFT/RIGHT) */
+.steering-btn {
+    height: 100%;
+    min-height: 200px;
+    background: linear-gradient(180deg, #3d3d5c 0%, #2d2d3a 100%);
+    border: 3px solid #4a4a5a;
+    color: #fff;
+    box-shadow: 0 6px 0 #1a1a2e, 0 8px 15px rgba(0, 0, 0, 0.4);
+}
+
+.steering-btn:active,
+.steering-btn.active {
+    transform: translateY(6px);
+    box-shadow: 0 0 0 #1a1a2e, 0 2px 5px rgba(0, 0, 0, 0.3);
+    background: linear-gradient(180deg, #4ecdc4 0%, #26a69a 100%);
+    border-color: #4ecdc4;
+}
+
+.steering-btn .btn-label {
+    color: #888;
+}
+
+.steering-btn:active .btn-label,
+.steering-btn.active .btn-label {
+    color: #000;
+}
+
+/* Nitro Button */
+.nitro-btn {
+    flex: 1;
+    max-height: 45%;
+    background: linear-gradient(180deg, #00bcd4 0%, #0097a7 100%);
+    border: 3px solid #00e5ff;
+    color: #000;
+    box-shadow: 0 6px 0 #006064, 0 8px 15px rgba(0, 0, 0, 0.4), 0 0 30px rgba(0, 229, 255, 0.3);
+}
+
+.nitro-btn:active,
+.nitro-btn.active {
+    transform: translateY(6px);
+    box-shadow: 0 0 0 #006064, 0 2px 5px rgba(0, 0, 0, 0.3), 0 0 50px rgba(0, 229, 255, 0.6);
+    background: linear-gradient(180deg, #00e5ff 0%, #00bcd4 100%);
+}
+
+.nitro-btn .btn-icon {
+    text-shadow: 0 0 20px rgba(255, 255, 0, 0.8);
+}
+
+/* Gun Button */
+.gun-btn {
+    flex: 1;
+    max-height: 45%;
+    background: linear-gradient(180deg, #e63946 0%, #b02a37 100%);
+    border: 3px solid #ff6b6b;
+    color: #fff;
+    box-shadow: 0 6px 0 #7a1a22, 0 8px 15px rgba(0, 0, 0, 0.4), 0 0 30px rgba(230, 57, 70, 0.3);
+}
+
+.gun-btn:active,
+.gun-btn.active {
+    transform: translateY(6px);
+    box-shadow: 0 0 0 #7a1a22, 0 2px 5px rgba(0, 0, 0, 0.3), 0 0 50px rgba(255, 107, 107, 0.6);
+    background: linear-gradient(180deg, #ff6b6b 0%, #e63946 100%);
+}
+
+.gun-btn .btn-icon {
+    font-size: 2.5rem;
+}
+
+.gun-btn.disabled {
+    opacity: 0.5;
+    background: linear-gradient(180deg, #555 0%, #333 100%);
+    border-color: #666;
+    box-shadow: 0 4px 0 #222;
+}
+
+/* ========================================
+   Game Over Screen
+======================================== */
+
+.caught {
+    font-size: 2.5rem !important;
+    animation: shake 0.5s ease-in-out;
+}
+
+@keyframes shake {
+
+    0%,
+    100% {
+        transform: translateX(0);
+    }
+
+    25% {
+        transform: translateX(-10px);
+    }
+
+    75% {
+        transform: translateX(10px);
+    }
+}
+
+.stats {
+    text-align: center;
+}
+
+.stats p {
+    font-size: 0.8rem;
+    margin: 15px 0;
+}
+
+.stats span {
+    color: #ffd166;
+}
+
+.retry {
+    background: linear-gradient(180deg, #e63946 0%, #b02a37 100%);
+    box-shadow: 0 4px 0 #7a1a22, 0 6px 10px rgba(0, 0, 0, 0.3);
+    animation: pulse 2s ease-in-out infinite;
+}
+
+@keyframes pulse {
+
+    0%,
+    100% {
+        transform: scale(1);
+    }
+
+    50% {
+        transform: scale(1.05);
+    }
+}
+
+/* ========================================
+   Disconnected Screen
+======================================== */
+
+#disconnected-screen h1 {
+    color: #e63946;
+}
+
+/* ========================================
+   Responsive
+======================================== */
+
+@media (max-height: 500px) {
+    .controller-header {
+        padding: 5px 10px;
+    }
+
+    .main-controls {
+        padding: 5px;
+    }
+
+    .control-btn {
+        gap: 4px;
+    }
+
+    .btn-icon {
+        font-size: 1.5rem;
+    }
+
+    .btn-label {
+        font-size: 0.5rem;
+    }
+}
+
+@media (min-width: 500px) {
+    .btn-icon {
+        font-size: 2.5rem;
+    }
+
+    .btn-label {
+        font-size: 0.7rem;
+    }
+}
+
+/* Landscape optimization */
+@media (orientation: landscape) {
+    .controller-header {
+        padding: 5px 20px;
+    }
+
+    .main-controls {
+        padding: 5px 15px;
+    }
+
+    .steering-btn {
+        min-height: 150px;
+    }
+}

@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Just Drift - Controller</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <!-- Portrait Warning -->
+  <div id="rotate-warning">
+    <div class="rotate-content">
+      <div class="phone-icon">📱</div>
+      <div class="rotate-arrow">↻</div>
+      <p>ROTATE YOUR PHONE</p>
+      <p class="sub">Landscape mode required</p>
+    </div>
+  </div>
+
+  <!-- Join Screen -->
+  <div id="join-screen" class="screen-overlay">
+    <div class="join-container">
+      <h1 class="join-title">🏎️ JUST DRIFT</h1>
+      <p class="join-subtitle">Enter Room Code</p>
+      <input type="text" id="room-input" class="room-input" maxlength="4" placeholder="----" autocomplete="off">
+      <button id="join-btn" class="join-btn">JOIN GAME</button>
+      <p id="error-msg" class="error-msg"></p>
+    </div>
+  </div>
+
+  <!-- Main Controller -->
+  <div id="controller-root" class="arcade-frame hidden">
+    <!-- Scanline Overlay -->
+    <div class="scanlines"></div>
+    
+    <!-- Controls Container -->
+    <div class="controls-container">
+      
+      <!-- LEFT SIDE: Steering Buttons -->
+      <div class="steering-zone">
+        <button id="btn-left" class="steer-btn">
+          <span class="steer-icon">◀</span>
+          <span class="steer-label">LEFT</span>
+        </button>
+        <button id="btn-right" class="steer-btn">
+          <span class="steer-icon">▶</span>
+          <span class="steer-label">RIGHT</span>
+        </button>
+      </div>
+      
+      <!-- RIGHT SIDE: Action Buttons + HUD -->
+      <div class="action-zone">
+        <!-- Counters + Pause -->
+        <div class="counters">
+          <div class="counter ammo-counter">
+            <span class="counter-label">AMMO</span>
+            <span class="counter-value" id="ammo-count">50</span>
+          </div>
+          <div class="counter nitro-counter">
+            <span class="counter-label">N2O</span>
+            <div class="nitro-bar">
+              <div class="nitro-fill" id="n2o-fill"></div>
+            </div>
+          </div>
+          <button id="btn-pause" class="pause-btn-small">⏸</button>
+        </div>
+        
+        <!-- Action Buttons -->
+        <div class="action-buttons">
+          <button id="btn-gun" class="action-btn fire-btn">
+            <span class="btn-icon">🔫</span>
+            <span class="btn-label">FIRE</span>
+          </button>
+          <button id="btn-nitro" class="action-btn nitro-btn">
+            <span class="btn-icon">🔥</span>
+            <span class="btn-label">NITRO</span>
+          </button>
+        </div>
+      </div>
+      
+    </div>
+  </div>
+
+  <script src="/socket.io/socket.io.js"></script>
+  <script src="controller.js"></script>
+</body>
+</html>

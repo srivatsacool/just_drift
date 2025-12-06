@@ -1,0 +1,528 @@
+/* ========================================
+   JUST DRIFT - Display Styles
+======================================== */
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+html,
+body {
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+}
+
+body {
+    background: #0a0a1a;
+    font-family: 'Press Start 2P', cursive;
+    color: #ffffff;
+}
+
+#game-container {
+    width: 100vw;
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+    overflow: hidden;
+}
+
+#gameCanvas {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: #1a1a2e;
+    image-rendering: pixelated;
+    image-rendering: crisp-edges;
+}
+
+/* ========================================
+   Overlays
+======================================== */
+
+.overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    background: rgba(10, 10, 15, 0.95);
+    z-index: 10;
+    text-align: center;
+    padding: 20px;
+}
+
+.overlay.hidden {
+    display: none;
+}
+
+/* Title Screen */
+.game-title {
+    font-size: 4rem;
+    color: #e63946;
+    text-shadow: 4px 4px 0 #000, -2px -2px 0 #ff6b6b;
+    margin-bottom: 20px;
+    animation: pulse 2s ease-in-out infinite;
+}
+
+@keyframes pulse {
+
+    0%,
+    100% {
+        transform: scale(1);
+    }
+
+    50% {
+        transform: scale(1.05);
+    }
+}
+
+.tagline {
+    font-size: 0.8rem;
+    color: #ffd166;
+    margin-bottom: 40px;
+    letter-spacing: 2px;
+}
+
+.car-preview {
+    width: 80px;
+    height: 120px;
+    background: #ffd166;
+    margin: 20px 0;
+    clip-path: polygon(20% 0%, 80% 0%, 90% 15%, 90% 85%, 80% 100%, 20% 100%, 10% 85%, 10% 15%);
+    box-shadow: 0 0 30px rgba(255, 209, 102, 0.5);
+}
+
+.waiting-text {
+    font-size: 0.7rem;
+    color: #888;
+    animation: blink 1s infinite;
+}
+
+@keyframes blink {
+
+    0%,
+    50% {
+        opacity: 1;
+    }
+
+    51%,
+    100% {
+        opacity: 0.3;
+    }
+}
+
+/* Waiting Screen */
+#waiting-screen h2 {
+    font-size: 1.2rem;
+    color: #4ecdc4;
+    margin-bottom: 40px;
+}
+
+.room-code-container {
+    margin: 20px 0;
+}
+
+.room-code-container p {
+    font-size: 0.7rem;
+    color: #888;
+    margin-bottom: 10px;
+}
+
+.room-code {
+    font-size: 3rem;
+    color: #ffd166;
+    letter-spacing: 10px;
+    padding: 20px 30px;
+    border: 4px solid #ffd166;
+    background: rgba(255, 209, 102, 0.1);
+    text-shadow: 0 0 20px rgba(255, 209, 102, 0.5);
+}
+
+.instruction {
+    font-size: 0.6rem;
+    color: #666;
+    margin-top: 30px;
+}
+
+.url {
+    font-size: 0.7rem;
+    color: #4ecdc4;
+    margin-top: 10px;
+    word-break: break-all;
+}
+
+#qr-code {
+    margin-top: 20px;
+    padding: 10px;
+    background: white;
+    border-radius: 8px;
+}
+
+#qr-code canvas {
+    display: block;
+}
+
+/* ========================================
+   Game Over Screen
+======================================== */
+
+.caught-text {
+    font-size: 3rem;
+    color: #e63946;
+    text-shadow: 4px 4px 0 #000, 0 0 30px rgba(230, 57, 70, 0.8);
+    margin-bottom: 30px;
+    animation: shake 0.5s ease-in-out;
+}
+
+@keyframes shake {
+
+    0%,
+    100% {
+        transform: translateX(0);
+    }
+
+    25% {
+        transform: translateX(-10px);
+    }
+
+    75% {
+        transform: translateX(10px);
+    }
+}
+
+.final-stats {
+    margin: 20px 0;
+}
+
+.final-stats p {
+    font-size: 1.2rem;
+    margin: 15px 0;
+    color: #fff;
+}
+
+.final-stats span {
+    color: #ffd166;
+}
+
+/* Retry Button - Centered */
+.retry-btn {
+    margin-top: 40px;
+    padding: 25px 60px;
+    font-family: 'Press Start 2P', cursive;
+    font-size: 1.5rem;
+    background: linear-gradient(180deg, #00ff88 0%, #00cc6a 50%, #009950 100%);
+    border: 5px solid #006633;
+    border-radius: 20px;
+    color: #000;
+    cursor: pointer;
+    box-shadow:
+        0 0 40px rgba(0, 255, 136, 0.6),
+        0 10px 0 #006633;
+    transition: all 0.1s;
+    display: block;
+}
+
+.retry-btn:hover {
+    box-shadow:
+        0 0 60px rgba(0, 255, 136, 0.9),
+        0 10px 0 #006633;
+    transform: scale(1.05);
+}
+
+.retry-btn:active {
+    transform: translateY(10px);
+    box-shadow:
+        0 0 60px rgba(0, 255, 136, 1),
+        0 0 0 #006633;
+}
+
+.retry-hint {
+    font-size: 0.6rem;
+    color: #666;
+    margin-top: 25px;
+}
+
+/* ========================================
+   Ready Screen
+======================================== */
+
+.ready-title {
+    font-size: 2rem;
+    color: #00ff88;
+    text-shadow: 4px 4px 0 #000, 0 0 30px rgba(0, 255, 136, 0.8);
+    margin-bottom: 20px;
+    animation: pulse 2s ease-in-out infinite;
+}
+
+.ready-text {
+    font-size: 1.5rem;
+    color: #ffd166;
+    text-shadow: 4px 4px 0 #000;
+    margin: 20px 0;
+}
+
+.ready-hint {
+    font-size: 0.7rem;
+    color: #4ecdc4;
+    margin-top: 15px;
+    animation: blink 1s infinite;
+}
+
+/* ========================================
+   Yellow Arcade Start Button
+======================================== */
+
+.arcade-start-container {
+    margin-top: 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 15px;
+}
+
+.arcade-start-btn {
+    position: relative;
+    width: 180px;
+    height: 180px;
+    cursor: pointer;
+}
+
+.arcade-btn-glow {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 170px;
+    height: 170px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(255, 209, 102, 0.7) 0%, transparent 70%);
+    animation: arcadeGlow 1.5s ease-in-out infinite;
+}
+
+@keyframes arcadeGlow {
+
+    0%,
+    100% {
+        transform: translate(-50%, -50%) scale(1);
+        opacity: 0.7;
+    }
+
+    50% {
+        transform: translate(-50%, -50%) scale(1.3);
+        opacity: 1;
+    }
+}
+
+.arcade-btn-inner {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 140px;
+    height: 140px;
+    border-radius: 50%;
+    background: linear-gradient(180deg, #ffd166 0%, #ffb833 50%, #e6a000 100%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+    border: 6px solid #cc8800;
+    box-shadow:
+        0 10px 0 #996600,
+        0 15px 30px rgba(0, 0, 0, 0.6),
+        inset 0 -8px 25px rgba(0, 0, 0, 0.3),
+        0 0 80px rgba(255, 209, 102, 0.6);
+    animation: arcadePulse 1.5s ease-in-out infinite;
+    transition: transform 0.1s, box-shadow 0.1s;
+}
+
+.arcade-btn-inner:hover {
+    transform: translate(-50%, -50%) scale(1.08);
+}
+
+.arcade-btn-inner:active {
+    transform: translate(-50%, calc(-50% + 10px));
+    box-shadow: 0 0 0 #996600, 0 5px 15px rgba(0, 0, 0, 0.5);
+}
+
+@keyframes arcadePulse {
+
+    0%,
+    100% {
+        box-shadow: 0 10px 0 #996600, 0 0 80px rgba(255, 209, 102, 0.6);
+    }
+
+    50% {
+        box-shadow: 0 10px 0 #996600, 0 0 120px rgba(255, 209, 102, 1);
+    }
+}
+
+.arcade-btn-icon {
+    font-size: 2.5rem;
+    color: #000;
+}
+
+.arcade-btn-text {
+    font-family: 'Press Start 2P', cursive;
+    font-size: 1rem;
+    color: #000;
+}
+
+/* ========================================
+   Pause Screen
+======================================== */
+
+.pause-title {
+    font-size: 3rem;
+    color: #4ecdc4;
+    text-shadow: 4px 4px 0 #000, 0 0 30px rgba(78, 205, 196, 0.8);
+    margin-bottom: 40px;
+}
+
+.pause-menu {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    margin: 20px 0;
+}
+
+.pause-btn {
+    padding: 18px 40px;
+    font-family: 'Press Start 2P', cursive;
+    font-size: 0.9rem;
+    background: linear-gradient(180deg, #3d3d5c 0%, #2d2d3a 100%);
+    color: #fff;
+    border: 3px solid #4a4a5a;
+    border-radius: 8px;
+    cursor: pointer;
+    text-decoration: none;
+    text-align: center;
+    box-shadow: 0 4px 0 #1a1a2e;
+    transition: all 0.1s;
+}
+
+.pause-btn:hover {
+    border-color: #4ecdc4;
+    color: #4ecdc4;
+    transform: translateY(-2px);
+}
+
+.pause-btn:active {
+    transform: translateY(4px);
+    box-shadow: none;
+}
+
+.pause-hint {
+    font-size: 0.5rem;
+    color: #666;
+    margin-top: 30px;
+}
+
+/* ========================================
+   HUD
+======================================== */
+
+#hud {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    display: flex;
+    justify-content: space-between;
+    padding: 20px 40px;
+    z-index: 5;
+    pointer-events: none;
+}
+
+#hud.hidden {
+    display: none;
+}
+
+.hud-left,
+.hud-right {
+    display: flex;
+    gap: 30px;
+}
+
+.hud-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.hud-label {
+    font-size: 0.6rem;
+    color: #888;
+    margin-bottom: 5px;
+}
+
+.hud-value {
+    font-size: 1.2rem;
+    color: #ffd166;
+    text-shadow: 2px 2px 0 #000;
+}
+
+.hud-value.ammo-value {
+    color: #ff6b6b;
+}
+
+.nitro-bar-display {
+    width: 150px;
+    height: 20px;
+    background: #1a1a2e;
+    border: 3px solid #4ecdc4;
+    border-radius: 10px;
+    overflow: hidden;
+}
+
+.nitro-fill-display {
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, #4ecdc4 0%, #00ff88 100%);
+    transition: width 0.3s;
+}
+
+/* ========================================
+   Responsive
+======================================== */
+
+@media (max-width: 768px) {
+    .game-title {
+        font-size: 2rem;
+    }
+
+    .room-code {
+        font-size: 2rem;
+        letter-spacing: 5px;
+    }
+
+    .caught-text {
+        font-size: 2rem;
+    }
+
+    .retry-btn {
+        padding: 15px 40px;
+        font-size: 1rem;
+    }
+
+    .hud-value {
+        font-size: 1rem;
+    }
+
+    .nitro-bar-display {
+        width: 100px;
+        height: 15px;
+    }
+}
