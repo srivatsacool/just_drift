@@ -261,8 +261,12 @@ class Game {
     this.nitroFillDisplay = document.getElementById('nitro-fill-display');
     this.finalTimeDisplay = document.getElementById('final-time');
     this.finalScoreDisplay = document.getElementById('final-score');
+    this.highScoreDisplay = document.getElementById('high-score');
     this.controllerUrlDisplay = document.getElementById('controller-url');
     this.resumeBtn = document.getElementById('resume-btn');
+    
+    // High score from localStorage
+    this.highScore = parseInt(localStorage.getItem('justdrift_highscore')) || 0;
     
     this.init();
   }
@@ -285,9 +289,16 @@ class Game {
     }
     
     // Arcade start button click handler (on display)
-    const arcadeStartBtn = document.querySelector('.arcade-start-btn');
+    const arcadeStartBtn = document.querySelector('.start-btn');
     if (arcadeStartBtn) {
       arcadeStartBtn.addEventListener('click', () => {
+        if (this.state === GameState.READY) {
+          this.socket.emit('startGame');
+          this.startGame();
+        }
+      });
+      arcadeStartBtn.addEventListener('touchend', (e) => {
+        e.preventDefault();
         if (this.state === GameState.READY) {
           this.socket.emit('startGame');
           this.startGame();
@@ -304,6 +315,23 @@ class Game {
         }
       });
     }
+    
+    // HUD Pause button click handler
+    const hudPauseBtn = document.getElementById('hud-pause-btn');
+    if (hudPauseBtn) {
+      hudPauseBtn.addEventListener('click', () => {
+        this.togglePause();
+      });
+    }
+    
+    // Keyboard controls for pause (P or Escape)
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'p' || e.key === 'P' || e.key === 'Escape') {
+        if (this.state === GameState.PLAYING || this.state === GameState.PAUSED) {
+          this.togglePause();
+        }
+      }
+    });
   }
   
   setupCanvas() {
@@ -610,6 +638,7 @@ class Game {
     
     // Handle nitro refill - send to controller
     if (type === PowerUpType.NITRO_REFILL) {
+      console.log('Activating NITRO REFILL');
       this.socket.emit('nitroRefill');
       this.sound.playNitro();
       return;
@@ -733,8 +762,21 @@ class Game {
     setTimeout(() => {
       this.showScreen('gameOver');
       this.sound.playGameOver();
+      
+      // Update final stats
       this.finalTimeDisplay.textContent = this.formatTime(this.time);
       this.finalScoreDisplay.textContent = Math.floor(this.score);
+      
+      // Update high score
+      const currentScore = Math.floor(this.score);
+      if (currentScore > this.highScore) {
+        this.highScore = currentScore;
+        localStorage.setItem('justdrift_highscore', this.highScore);
+      }
+      if (this.highScoreDisplay) {
+        this.highScoreDisplay.textContent = this.highScore;
+      }
+      
       this.socket.emit('gameOver', { time: this.time, score: this.score });
     }, 1500);
   }

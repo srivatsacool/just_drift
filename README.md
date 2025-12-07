@@ -21,16 +21,13 @@
 
 - [🎮 About the Game](#-about-the-game)
 - [✨ Features](#-features)
-- [🏗️ Architecture](#️-architecture)
 - [🚀 Quick Start](#-quick-start)
 - [🎯 How to Play](#-how-to-play)
 - [💥 Power-ups](#-power-ups)
 - [📱 Controller Features](#-controller-features)
 - [🖥️ Display Features](#️-display-features)
 - [📁 Project Structure](#-project-structure)
-- [🎨 Visual Design](#-visual-design)
 - [🔧 Configuration](#-configuration)
-- [🌐 Deployment](#-deployment)
 - [🤝 Credits](#-credits)
 
 ---
@@ -38,8 +35,6 @@
 ## 🎮 About the Game
 
 **Just Drift** is a fast-paced, top-down 8-bit arcade chase game where you play as a thief in a getaway car being pursued by relentless police!
-
-### 🎲 Game Concept
 
 | Aspect | Description |
 |--------|-------------|
@@ -54,90 +49,36 @@
 
 ### 🎮 Core Gameplay
 - ⚡ **Fast-paced chase mechanics** with smart AI police
-- 🚗 **Smooth drifting physics** for tight cornering
+- 🚗 **Smooth driving physics** with nitro boost
 - 💰 **Coin collection system** for higher scores
 - 🔫 **Shooting mechanics** to destroy police cars
-- ⏸️ **Pause functionality** from controller
-- 🏆 **Score tracking** based on time and coins
+- ⏸️ **Pause functionality** from both display and controller
+- 🏆 **High score tracking** saved locally
+- 🔄 **Retry system** on both interfaces
 
-### 🌟 Power-up System
-- 🛡️ **Shield** - Temporary invincibility
-- 🔫 **Machine Gun** - Rapid-fire mode
-- 💥 **EMP Blast** - Destroy all visible police cars
-- ⚡ **Infinite Nitro** - Unlimited boost
-- 🧲 **Coin Magnet** - Attract nearby coins
+### 🌟 Power-up System (6 Types)
+- 🛡️ **Shield** - Temporary invincibility (5s)
+- 🔫 **Machine Gun** - Rapid-fire mode (5s)
+- 💥 **EMP Blast** - Destroy all visible police cars (instant)
+- ⚡ **Infinite Nitro** - Unlimited boost (5s)
+- 🧲 **Coin Magnet** - Attract nearby coins (10s)
+- ⛽ **Nitro Refill** - Instantly refills nitro to 100% (spawns 5x more frequently)
 
 ### 📱 Mobile Controller
-- 🕹️ Touch-optimized controls
+- 🕹️ Touch-optimized large buttons
 - 📳 Haptic feedback for immersion
-- 🎯 Ready screen with START button
-- 🔄 Auto-reconnection on disconnect
 - 📊 Real-time ammo and nitro display
+- ⏸️ Pause button in HUD
+- 🔄 Retry button on game over
+- 🎨 8-bit arcade visual theme
 
 ### 🖥️ Display Features
 - 🎨 8-bit retro pixel art visuals
-- 🔊 Sound effects and sirens
-- 📺 Beautiful overlay screens
+- 📺 CRT scanline effects
+- 🔊 8-bit sound effects
 - 📝 QR code for easy controller connection
-- ⏱️ Real-time HUD with score and time
-
----
-
-## 🏗️ Architecture
-
-```mermaid
-flowchart TB
-    subgraph DISPLAY["🖥️ Display (Laptop/Desktop)"]
-        D1[Game Engine]
-        D2[Canvas Renderer]
-        D3[Sound System]
-    end
-    
-    subgraph CONTROLLER["📱 Controller (Mobile Phone)"]
-        C1[Touch Input]
-        C2[Haptic Feedback]
-        C3[UI Components]
-    end
-    
-    subgraph SERVER["🖧 Node.js Server"]
-        S1[Express.js]
-        S2[Socket.IO]
-        S3[Room Manager]
-    end
-    
-    CONTROLLER <-->|WebSocket| SERVER
-    DISPLAY <-->|WebSocket| SERVER
-    
-    SERVER -->|Game State| DISPLAY
-    CONTROLLER -->|Input Commands| SERVER
-```
-
-### 🔄 Data Flow
-
-```mermaid
-sequenceDiagram
-    participant D as Display
-    participant S as Server
-    participant C as Controller
-    
-    D->>S: Create Room
-    S->>D: Room Code (4 digits)
-    C->>S: Join Room (code)
-    S->>D: Controller Joined
-    S->>C: Ready State
-    C->>S: Start Game
-    S->>D: Start Game
-    
-    loop Gameplay
-        C->>S: Input (steering, nitro, shoot)
-        S->>D: Relay Input
-        D->>S: Game Events (ammo, hit, end)
-        S->>C: Update State
-    end
-    
-    D->>S: Game Over
-    S->>C: Show Results
-```
+- ⏱️ Real-time HUD with score, time, ammo, nitro
+- ⏸️ Pause button + keyboard shortcuts (P / Escape)
 
 ---
 
@@ -145,7 +86,7 @@ sequenceDiagram
 
 ### Prerequisites
 - Node.js 18+
-- npm or yarn
+- npm
 
 ### Installation
 
@@ -168,8 +109,7 @@ npm start
 1. **Start the server:**
    ```bash
    npm start
-   # or for development with nodemon
-   npm run dev
+   # Server runs on http://localhost:3000 (or PORT env variable)
    ```
 
 2. **Open the Display:**
@@ -179,92 +119,96 @@ npm start
 3. **Connect the Controller:**
    - Open `http://localhost:3000/controller` on your mobile phone
    - Enter the 4-digit room code
-   - Tap the **START** button to begin!
+   - Tap **FIRE** on controller to start!
 
 ---
 
 ## 🎯 How to Play
 
-### 📱 Controller Layout
+### 📱 Controller Layout (Landscape Mode)
 
 ```
-┌─────────────────────────────────────────┐
-│           [AMMO: 5]  [NITRO: ████]      │
-├─────────────────────────────────────────┤
-│                                         │
-│  ┌───────┐    ┌───────┐    ┌───────┐   │
-│  │       │    │  ⚡   │    │       │   │
-│  │   ◀   │    │ NITRO │    │   ▶   │   │
-│  │ LEFT  │    │       │    │ RIGHT │   │
-│  │       │    ├───────┤    │       │   │
-│  │       │    │  💥   │    │       │   │
-│  │       │    │ FIRE  │    │       │   │
-│  └───────┘    └───────┘    └───────┘   │
-│                                         │
-└─────────────────────────────────────────┘
+┌─────────────────────────────────────────────────────┐
+│  [AMMO: 50]  [N2O: ████████]              [⏸]      │
+├─────────────────────────────────────────────────────┤
+│                                                     │
+│  ┌─────────────┐  ┌─────────────┐   ┌───────────┐  │
+│  │             │  │             │   │    🔫     │  │
+│  │      ◀      │  │      ▶      │   │   FIRE    │  │
+│  │    LEFT     │  │    RIGHT    │   ├───────────┤  │
+│  │             │  │             │   │    ⚡     │  │
+│  │             │  │             │   │   NITRO   │  │
+│  └─────────────┘  └─────────────┘   └───────────┘  │
+│                                                     │
+└─────────────────────────────────────────────────────┘
 ```
 
 ### 🎮 Controls
 
 | Button | Action | Description |
 |--------|--------|-------------|
-| **◀ LEFT** | Steer Left | Move car to the left |
-| **▶ RIGHT** | Steer Right | Move car to the right |
-| **⚡ NITRO** | Hold to Boost | Speed boost (consumes nitro) |
-| **💥 FIRE** | Shoot | Fire bullets at police (uses ammo) |
-| **⏸️ PAUSE** | Pause Game | Pause/Resume the game |
+| **◀ LEFT** | Steer Left | Hold to move car left |
+| **▶ RIGHT** | Steer Right | Hold to move car right |
+| **⚡ NITRO** | Hold to Boost | Speed boost (drains nitro bar) |
+| **🔫 FIRE** | Shoot | Fire bullets at police |
+| **⏸ PAUSE** | Pause/Resume | Pause the game |
+
+### ⌨️ Keyboard Controls (Display)
+
+| Key | Action |
+|-----|--------|
+| **P** | Pause/Resume |
+| **Escape** | Pause/Resume |
 
 ### 🏁 Gameplay Tips
 
-1. **Collect coins** 💰 - They give bonus points and refill resources
-2. **Use nitro wisely** - Save it for tight escapes
+1. **Collect coins** 💰 - They give bonus points
+2. **Use nitro wisely** - It refills automatically when not in use
 3. **Aim for power-ups** - They spawn every 4 seconds
-4. **Destroy police cars** - Each destruction gives 100 points
-5. **Watch your ammo** - Coins refill your ammo
+4. **Look for cyan power-ups (⛽)** - They instantly refill your nitro!
+5. **Destroy police cars** - Each destruction gives 500 points
 
 ---
 
 ## 💥 Power-ups
 
-Power-ups spawn every **4 seconds** and provide temporary abilities:
+Power-ups spawn every **4 seconds** (max 2 on screen):
 
-| Power-up | Icon | Duration | Effect |
-|----------|------|----------|--------|
-| **Shield** | 🛡️ | 5 seconds | Invincibility - collisions destroy police instead |
-| **Machine Gun** | 🔫 | 5 seconds | Rapid fire - shoot continuously |
-| **EMP Blast** | 💥 | Instant | Destroys ALL visible police cars |
-| **Infinite Nitro** | ⚡ | 5 seconds | Unlimited nitro boost |
-| **Coin Magnet** | 🧲 | 10 seconds | Attracts nearby coins automatically |
+| Power-up | Icon | Color | Duration | Effect |
+|----------|------|-------|----------|--------|
+| **Shield** | 🛡️ | Teal | 5s | Invincibility |
+| **Machine Gun** | 🔫 | Red | 5s | Rapid fire |
+| **EMP Blast** | 💥 | Yellow | Instant | Destroy all police |
+| **Infinite Nitro** | ⚡ | Green | 5s | Unlimited boost |
+| **Coin Magnet** | 🧲 | Purple | 10s | Attract nearby coins |
+| **Nitro Refill** | ⛽ | Cyan | Instant | Refill nitro to 100% |
 
-### Power-up Spawn Locations
-- Random positions ahead of the player
-- Within the road boundaries
-- Maximum 2 power-ups on screen at once
+> **Note:** Nitro Refill spawns **5x more frequently** than other power-ups!
 
 ---
 
 ## 📱 Controller Features
 
-### 🎨 Arcade Frame UI
-The controller features a beautiful **purple neon arcade frame** design:
-- Gradient dark background
-- Purple glow border effect
-- Inner screen glow
-- Racing stripes on logo
-
-### 📱 Ready Screen
-When connected, a dedicated ready screen appears with:
-- Big green **START** button
-- Room code display
-- Pulsing animations
-- Car driving animation
+### 🎨 8-Bit Arcade Design
+- CRT scanline overlay
+- Neon color scheme (cyan, yellow, red, green)
+- Pixel font (Press Start 2P)
+- Dark arcade cabinet aesthetic
 
 ### 📳 Haptic Feedback
-Different vibration patterns for:
-- Button presses (30ms)
-- Shooting (80ms-120ms recoil pattern)
-- Hit confirmation (100ms-50ms-100ms success pattern)
-- Game over (200ms-100ms-400ms pattern)
+| Event | Vibration |
+|-------|-----------|
+| Button press | 20-50ms |
+| Shooting | 50ms |
+| Game over | 300ms |
+| Nitro refill | 100ms |
+
+### 🎮 Game Over Overlay
+When busted, the controller shows:
+- Flashing police lights (red/blue)
+- "BUSTED!" title
+- Final score
+- **RETRY** button
 
 ---
 
@@ -272,18 +216,24 @@ Different vibration patterns for:
 
 ### 📺 Game Screens
 
-1. **Title Screen** - Game logo and waiting state
-2. **Waiting Screen** - Room code + QR code for quick connection
-3. **Ready Screen** - Controller connected, waiting to start
+1. **Title Screen** - Loading animation
+2. **Waiting Screen** - Room code + QR code
+3. **Ready Screen** - "READY?" with START button
 4. **Playing** - Main gameplay with HUD
-5. **Pause Screen** - Paused state with resume option
-6. **Game Over** - Final score and retry option
+5. **Pause Screen** - Resume/Quit options
+6. **Game Over** - Score, High Score, Retry button
 
 ### 🎛️ HUD Elements
-- **Time** - Elapsed game time
-- **Score** - Current points
-- **Ammo** - Bullets remaining
-- **Nitro Bar** - Nitro level display
+- **SCORE** - Current points
+- **TIME** - Elapsed game time
+- **N2O** - Nitro bar (changes color when low)
+- **AMMO** - Bullets remaining
+- **⏸** - Pause button
+
+### 🏆 High Score
+- Saved to browser localStorage
+- Displayed on game over screen
+- Persists across sessions
 
 ---
 
@@ -291,57 +241,26 @@ Different vibration patterns for:
 
 ```
 just-drift/
-├── 📄 server.js              # Node.js + Express + Socket.IO server
-├── 📄 package.json           # Dependencies and scripts
-├── 📄 ecosystem.config.js    # PM2 production configuration
-├── 📄 nginx.conf.example     # Nginx reverse proxy template
+├── 📄 server.js              # Node.js + Express + Socket.IO
+├── 📄 package.json           # Dependencies
 ├── 📄 README.md              # This file
 │
 ├── 📂 public/
-│   ├── 📄 index.html         # Home page with menu
+│   ├── 📄 index.html         # Home page
 │   ├── 🖼️ bg_2.jpeg          # Background image
 │   │
-│   ├── 📂 display/           # Display client (laptop/desktop)
+│   ├── 📂 display/           # Game display (laptop/desktop)
 │   │   ├── 📄 index.html     # Display HTML
-│   │   ├── 📄 game.js        # Game engine (1500+ lines)
+│   │   ├── 📄 game.js        # Game engine (~1600 lines)
 │   │   └── 📄 style.css      # Display styles
 │   │
-│   └── 📂 controller/        # Controller client (mobile)
+│   └── 📂 controller/        # Controller (mobile phone)
 │       ├── 📄 index.html     # Controller HTML
 │       ├── 📄 controller.js  # Input handling
-│       ├── 📄 style.css      # Base styles
-│       └── 📄 arcade-theme.css  # Arcade frame UI
+│       └── 📄 style.css      # Controller styles
 │
-├── 🖼️ just_drift_2.jpeg      # Car showcase image
-├── 🖼️ controller.jpeg        # Controller preview
-└── 🖼️ bg.jpeg                # Alternative background
+└── 🖼️ just_drift_2.jpeg      # Logo image
 ```
-
----
-
-## 🎨 Visual Design
-
-### 🎨 Color Palette
-
-| Element | Color | Hex |
-|---------|-------|-----|
-| **Background** | Dark Black | `#0a0a0f` |
-| **Road** | Dark Gray | `#2d2d3a` |
-| **Player Car** | Yellow | `#ffd166` |
-| **Police Car** | Blue | `#2196f3` |
-| **Siren Red** | Bright Red | `#ff1744` |
-| **Siren Blue** | Cyan | `#00e5ff` |
-| **Coins** | Gold | `#ffd700` |
-| **UI Accent** | Teal | `#4ecdc4` |
-| **Power-up Glow** | Various | Per type |
-
-### ✨ Visual Effects
-- Pixelated 8-bit rendering
-- Police siren animations (red/blue alternating)
-- Road scrolling with painted lines
-- Coin collection sparkles
-- Power-up pulsing glow
-- Explosion particles
 
 ---
 
@@ -352,67 +271,31 @@ just-drift/
 | Variable | Default | Description |
 |----------|---------|-------------|
 | `PORT` | 3000 | Server port |
-| `NODE_ENV` | development | Environment mode |
 
 ### Game Configuration
 
-Edit `public/display/game.js` to adjust gameplay:
+Edit `public/display/game.js` CONFIG object:
 
 ```javascript
 const CONFIG = {
-  // Player settings
-  PLAYER_BASE_SPEED: 4,        // Base car speed
-  PLAYER_NITRO_MULT: 1.8,      // Nitro speed multiplier
-  PLAYER_MAX_NITRO: 100,       // Maximum nitro amount
-  PLAYER_NITRO_DRAIN: 0.5,     // Nitro drain rate
+  // Player
+  PLAYER_BASE_SPEED: 5,
+  PLAYER_MAX_SPEED: 8,
+  PLAYER_TURN_SPEED: 0.055,
   
-  // Police settings
-  POLICE_BASE_SPEED: 2.5,      // Police car speed
-  POLICE_MAX_COUNT: 5,         // Maximum police cars
-  POLICE_SPAWN_DELAY: 3000,    // Ms between spawns
+  // Police
+  POLICE_BASE_SPEED: 3,
+  POLICE_MAX_COUNT: 6,
+  POLICE_SPAWN_DELAY: 4000,
   
-  // Game settings
-  SCORE_PER_SECOND: 10,        // Points per second
-  COIN_VALUE: 50,              // Points per coin
-  KILL_SCORE: 100,             // Points per police destroyed
+  // Coins
+  COIN_SCORE: 150,
+  COIN_SPAWN_DELAY: 2000,
   
-  // Power-up timing
-  POWERUP_SPAWN_INTERVAL: 4000 // Ms between power-up spawns
+  // Scoring
+  SCORE_PER_SECOND: 10
 };
 ```
-
----
-
-## 🌐 Deployment
-
-### Production with PM2
-
-```bash
-# Install PM2 globally
-npm install -g pm2
-
-# Start the app
-pm2 start ecosystem.config.js --env production
-
-# Save PM2 list
-pm2 save
-
-# Setup startup script
-pm2 startup
-```
-
-### Nginx Configuration
-
-See `nginx.conf.example` for a complete template with:
-- HTTPS/SSL termination
-- WebSocket proxy
-- Static file caching
-
-### Cloudflare Setup
-
-1. Set SSL mode to **Full (Strict)**
-2. Enable WebSocket support (enabled by default)
-3. Create A-record pointing to server IP with **Proxy enabled**
 
 ---
 
@@ -420,13 +303,13 @@ See `nginx.conf.example` for a complete template with:
 
 | Aspect | Specification |
 |--------|---------------|
-| **Engine** | Vanilla JavaScript Canvas |
+| **Engine** | Vanilla JavaScript Canvas 2D |
 | **Server** | Node.js + Express.js |
 | **Real-time** | Socket.IO 4.x |
 | **Styling** | Pure CSS (no frameworks) |
-| **Font** | Press Start 2P (8-bit style) |
+| **Font** | Press Start 2P (Google Fonts) |
 | **Target FPS** | 60 FPS |
-| **Min Browser** | Chrome 80+, Firefox 75+, Safari 13+ |
+| **Browser Support** | Chrome 80+, Firefox 75+, Safari 13+, Edge 80+ |
 
 ---
 
@@ -436,26 +319,18 @@ See `nginx.conf.example` for a complete template with:
 
 ### Built with ❤️ by **Build.Srivatsa**
 
-Part of the arcade game collection using the innovative **laptop-display + phone-controller** architecture.
-
-*Inspired by classic arcade chase games and modern mobile gaming*
-
-</div>
+*A modern arcade game using the innovative laptop-display + phone-controller architecture*
 
 ---
 
-## 📄 License
+### 📄 License
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+This project is open source and available for personal use and modification.
 
 ---
-
-<div align="center">
 
 **🏎️ JUST DRIFT 🏎️**
 
 *Can you outrun the cops?*
 
 </div>
-#   j u s t _ d r i v e _ v i d e _ c o d e d  
- 

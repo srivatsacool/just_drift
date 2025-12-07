@@ -1,50 +1,66 @@
 /**
- * Just Drift - Landscape Controller
- * Mobile-first arcade racing game controller
+ * JUST DRIFT - Controller
+ * 8-Bit Arcade Racing Game Controller
+ * Mobile-first touch controls with haptic feedback
  */
 
 class ArcadeController {
   constructor() {
-    // Socket connection
+    // ==================== SOCKET ====================
     this.socket = null;
     this.roomCode = null;
     this.isConnected = false;
     
-    // Control state
+    // ==================== CONTROL STATE ====================
     this.controlState = {
-      steerX: 0,
-      steerY: 0,
+      steering: 0,      // -1 (left) to 1 (right)
       nitro: false,
-      nitroAmount: 100, // Start with full nitro
-      gun: false,
-      drift: false,
-      reverse: false
+      nitroAmount: 100, // Start with full nitro (0-100)
+      gun: false
     };
     
-    // Nitro config
+    // ==================== NITRO CONFIG ====================
     this.maxNitro = 100;
-    this.nitroUseRate = 40; // Drain per second when using
-    this.nitroRefillRate = 15; // Refill per second when not using
+    this.nitroUseRate = 35;    // Drain per second when using
+    this.nitroRefillRate = 12; // Refill per second when not using
+    this.lastNitroUpdate = null;
+    this.nitroLoop = null;
     
-    // Screen Elements
+    // ==================== DOM ELEMENTS ====================
+    // Screens
     this.joinScreen = document.getElementById('join-screen');
-    this.controllerRoot = document.getElementById('controller-root');
+    this.controllerScreen = document.getElementById('controller-screen');
+    
+    // Join Form
     this.roomInput = document.getElementById('room-input');
     this.joinBtn = document.getElementById('join-btn');
     this.errorMsg = document.getElementById('error-msg');
     
-    // Action Button Elements
+    // HUD
+    this.ammoCount = document.getElementById('ammo-count');
+    this.n2oFill = document.getElementById('n2o-fill');
+    this.connectionStatus = document.getElementById('connection-status');
+    
+    // Buttons
+    this.btnLeft = document.getElementById('btn-left');
+    this.btnRight = document.getElementById('btn-right');
     this.btnGun = document.getElementById('btn-gun');
     this.btnNitro = document.getElementById('btn-nitro');
+    this.btnPause = document.getElementById('btn-pause');
+    this.btnRetry = document.getElementById('btn-retry');
     
-    // HUD Elements
-    this.n2oFill = document.getElementById('n2o-fill');
-    this.ammoCount = document.getElementById('ammo-count');
+    // Game Over Overlay
+    this.gameoverOverlay = document.getElementById('gameover-overlay');
+    this.controllerScore = document.getElementById('controller-score');
     
+    // ==================== INITIALIZE ====================
     this.init();
   }
   
+  // ==================== INITIALIZATION ====================
   init() {
+    console.log('🎮 Controller initializing...');
+    
     this.setupSocket();
     this.setupJoinScreen();
     this.preventDefaults();
@@ -58,22 +74,57 @@ class ArcadeController {
     }
   }
   
+  // ==================== PREVENT DEFAULTS ====================
+  preventDefaults() {
+    // Prevent zoom and scroll on mobile
+    document.addEventListener('touchmove', (e) => {
+      if (e.touches.length > 1) e.preventDefault();
+    }, { passive: false });
+    
+    document.addEventListener('gesturestart', (e) => e.preventDefault());
+    document.addEventListener('gesturechange', (e) => e.preventDefault());
+    document.addEventListener('gestureend', (e) => e.preventDefault());
+    
+    // Prevent context menu
+    document.addEventListener('contextmenu', (e) => e.preventDefault());
+    
+    // Prevent double-tap zoom
+    let lastTouchEnd = 0;
+    document.addEventListener('touchend', (e) => {
+      const now = Date.now();
+      if (now - lastTouchEnd <= 300) e.preventDefault();
+      lastTouchEnd = now;
+    }, { passive: false });
+  }
+  
   // ==================== JOIN SCREEN ====================
   setupJoinScreen() {
+    // Join button click
     if (this.joinBtn) {
       this.joinBtn.addEventListener('click', () => this.attemptJoin());
+      this.joinBtn.addEventListener('touchend', (e) => {
+        e.preventDefault();
+        this.attemptJoin();
+      });
     }
     
+    // Room input
     if (this.roomInput) {
+      // Auto-capitalize and filter input
       this.roomInput.addEventListener('input', (e) => {
         e.target.value = e.target.value.toUpperCase().replace(/[^A-Z0-9]/g, '');
       });
       
+      // Enter key to join
       this.roomInput.addEventListener('keypress', (e) => {
         if (e.key === 'Enter') {
+          e.preventDefault();
           this.attemptJoin();
         }
       });
+      
+      // Focus input on load
+      setTimeout(() => this.roomInput.focus(), 100);
     }
   }
   
@@ -81,10 +132,12 @@ class ArcadeController {
     const code = this.roomInput?.value?.trim()?.toUpperCase();
     
     if (!code || code.length !== 4) {
-      this.showError('Enter 4-digit code');
+      this.showError('Enter 4-character code');
+      this.triggerHaptic(100);
       return;
     }
     
+    this.showError(''); // Clear error
     this.roomCode = code;
     this.joinRoom(code);
   }
@@ -92,34 +145,71 @@ class ArcadeController {
   showError(msg) {
     if (this.errorMsg) {
       this.errorMsg.textContent = msg;
-      setTimeout(() => {
-        this.errorMsg.textContent = '';
-      }, 3000);
     }
   }
   
+  // ==================== SHOW CONTROLLER ====================
   showController() {
-    if (this.joinScreen) {
-      this.joinScreen.classList.add('hidden');
-    }
-    if (this.controllerRoot) {
-      this.controllerRoot.classList.remove('hidden');
-    }
+    // Hide join screen, show controller
+    if (this.joinScreen) this.joinScreen.classList.add('hidden');
+    if (this.controllerScreen) this.controllerScreen.classList.remove('hidden');
     
-    // Initialize steering buttons and action buttons after showing controller
+    // Setup controls
     this.setupSteering();
-    this.setupButtons();
+    this.setupActionButtons();
+    this.setupPauseButton();
+    this.setupRetryButton();
     
     // Start nitro management loop
     this.lastNitroUpdate = Date.now();
     this.nitroLoop = setInterval(() => this.updateNitro(), 50);
+    
+    // Update connection status
+    this.updateConnectionStatus(true);
+    
+    console.log('🎮 Controller active!');
+  }
+  
+  // ==================== GAME OVER ====================
+  showGameOver(score) {
+    if (this.gameoverOverlay) {
+      this.gameoverOverlay.classList.remove('hidden');
+    }
+    if (this.controllerScore) {
+      this.controllerScore.textContent = Math.floor(score || 0);
+    }
+    this.triggerHaptic(300);
+  }
+  
+  hideGameOver() {
+    if (this.gameoverOverlay) {
+      this.gameoverOverlay.classList.add('hidden');
+    }
+  }
+  
+  setupRetryButton() {
+    if (!this.btnRetry) return;
+    
+    const handleRetry = () => {
+      this.socket?.emit('resetGame');
+      this.hideGameOver();
+      this.controlState.nitroAmount = this.maxNitro;
+      this.updateNitroUI();
+      this.triggerHaptic(100);
+    };
+    
+    this.btnRetry.addEventListener('click', handleRetry);
+    this.btnRetry.addEventListener('touchstart', (e) => {
+      e.preventDefault();
+      handleRetry();
+    }, { passive: false });
   }
   
   // ==================== NITRO MANAGEMENT ====================
   updateNitro() {
     const now = Date.now();
     
-    // Initialize lastNitroUpdate if missing
+    // Initialize if needed
     if (!this.lastNitroUpdate) {
       this.lastNitroUpdate = now;
       return;
@@ -141,7 +231,7 @@ class ArcadeController {
       // If nitro ran out, stop using it
       if (this.controlState.nitroAmount <= 0) {
         this.controlState.nitro = false;
-        this.sendControl({ nitro: false, nitroAmount: 0 });
+        this.sendControl({ nitro: false });
       }
     } else if (!this.controlState.nitro && this.controlState.nitroAmount < this.maxNitro) {
       // Refill nitro when not using
@@ -150,255 +240,286 @@ class ArcadeController {
     }
     
     // Update UI
+    this.updateNitroUI();
+  }
+  
+  updateNitroUI() {
     if (this.n2oFill) {
-      this.n2oFill.style.width = `${this.controlState.nitroAmount}%`;
+      const percent = Math.round(this.controlState.nitroAmount);
+      this.n2oFill.style.width = `${percent}%`;
+      
+      // Change color when low
+      if (percent < 20) {
+        this.n2oFill.style.background = 'linear-gradient(90deg, #ff6b6b 0%, #c92a2a 100%)';
+      } else {
+        this.n2oFill.style.background = 'linear-gradient(90deg, #4ecdc4 0%, #00ff88 100%)';
+      }
+    }
+    
+    // Update nitro button state
+    if (this.btnNitro) {
+      if (this.controlState.nitroAmount <= 0) {
+        this.btnNitro.classList.add('disabled');
+      } else {
+        this.btnNitro.classList.remove('disabled');
+      }
     }
   }
   
-  // ==================== STEERING BUTTONS ====================
+  // ==================== STEERING ====================
   setupSteering() {
-    this.btnLeft = document.getElementById('btn-left');
-    this.btnRight = document.getElementById('btn-right');
-    
-    // Left button
     this.setupSteerButton(this.btnLeft, -1);
-    
-    // Right button
     this.setupSteerButton(this.btnRight, 1);
   }
   
   setupSteerButton(btn, direction) {
     if (!btn) return;
     
+    const startSteering = () => {
+      btn.classList.add('active');
+      this.controlState.steering = direction;
+      this.sendControl({ steering: direction });
+      this.triggerHaptic(20);
+    };
+    
+    const stopSteering = () => {
+      btn.classList.remove('active');
+      this.controlState.steering = 0;
+      this.sendControl({ steering: 0 });
+    };
+    
     // Touch events
     btn.addEventListener('touchstart', (e) => {
       e.preventDefault();
-      btn.classList.add('active');
-      this.controlState.steerX = direction;
-      this.sendControl({ steering: direction });
-      this.triggerHaptic(30);
+      startSteering();
     }, { passive: false });
     
     btn.addEventListener('touchend', (e) => {
       e.preventDefault();
-      btn.classList.remove('active');
-      this.controlState.steerX = 0;
-      this.sendControl({ steering: 0 });
+      stopSteering();
     }, { passive: false });
     
-    btn.addEventListener('touchcancel', (e) => {
-      btn.classList.remove('active');
-      this.controlState.steerX = 0;
-      this.sendControl({ steering: 0 });
-    });
+    btn.addEventListener('touchcancel', stopSteering);
     
-    // Mouse events for desktop testing
+    // Mouse events (for desktop testing)
     btn.addEventListener('mousedown', (e) => {
       e.preventDefault();
-      btn.classList.add('active');
-      this.controlState.steerX = direction;
-      this.sendControl({ steering: direction });
+      startSteering();
     });
     
-    btn.addEventListener('mouseup', (e) => {
-      btn.classList.remove('active');
-      this.controlState.steerX = 0;
-      this.sendControl({ steering: 0 });
-    });
-    
+    btn.addEventListener('mouseup', stopSteering);
     btn.addEventListener('mouseleave', (e) => {
-      if (btn.classList.contains('active')) {
-        btn.classList.remove('active');
-        this.controlState.steerX = 0;
-        this.sendControl({ steering: 0 });
-      }
+      if (btn.classList.contains('active')) stopSteering();
     });
   }
   
-  // ==================== BUTTONS ====================
-  setupButtons() {
-    // Gun/Fire button
-    this.setupButton(this.btnGun, 'gun', () => {
-      this.sendControl({ gun: true });
-      this.socket?.emit('shoot');
-      this.triggerHaptic(50);
-    });
-    
-    // Nitro button (hold to use - only works if nitro available)
-    this.setupButton(this.btnNitro, 'nitro', 
+  // ==================== ACTION BUTTONS ====================
+  setupActionButtons() {
+    // Fire button
+    this.setupButton(this.btnGun, 'fire', 
       () => {
-        // Only activate nitro if there's some available
+        this.sendControl({ gun: true });
+        this.socket?.emit('shoot');
+        this.triggerHaptic(50);
+      },
+      () => {
+        this.sendControl({ gun: false });
+      }
+    );
+    
+    // Nitro button (hold to use)
+    this.setupButton(this.btnNitro, 'nitro',
+      () => {
         if (this.controlState.nitroAmount > 0) {
           this.controlState.nitro = true;
-          this.sendControl({ nitro: true, nitroAmount: this.controlState.nitroAmount });
+          this.sendControl({ nitro: true });
           this.triggerHaptic(30);
         }
       },
       () => {
         this.controlState.nitro = false;
-        this.sendControl({ nitro: false, nitroAmount: this.controlState.nitroAmount });
+        this.sendControl({ nitro: false });
       }
     );
-    
-    // Pause button
-    const pauseBtn = document.getElementById('btn-pause');
-    if (pauseBtn) {
-      const handlePause = () => {
-        this.socket?.emit('togglePause');
-        this.triggerHaptic(50);
-      };
-      pauseBtn.addEventListener('click', handlePause);
-      pauseBtn.addEventListener('touchstart', (e) => {
-        e.preventDefault();
-        handlePause();
-      }, { passive: false });
-    }
   }
   
   setupButton(btn, name, onPress, onRelease = null) {
     if (!btn) return;
     
+    const handlePress = () => {
+      btn.classList.add('active');
+      if (onPress) onPress();
+    };
+    
+    const handleRelease = () => {
+      btn.classList.remove('active');
+      if (onRelease) onRelease();
+    };
+    
     // Touch events
     btn.addEventListener('touchstart', (e) => {
       e.preventDefault();
-      btn.classList.add('active');
-      if (onPress) onPress();
+      handlePress();
     }, { passive: false });
     
     btn.addEventListener('touchend', (e) => {
       e.preventDefault();
-      btn.classList.remove('active');
-      if (onRelease) onRelease();
+      handleRelease();
     }, { passive: false });
     
-    btn.addEventListener('touchcancel', (e) => {
-      btn.classList.remove('active');
-      if (onRelease) onRelease();
-    });
+    btn.addEventListener('touchcancel', handleRelease);
     
-    // Mouse events (for desktop testing)
+    // Mouse events
     btn.addEventListener('mousedown', (e) => {
       e.preventDefault();
-      btn.classList.add('active');
-      if (onPress) onPress();
+      handlePress();
     });
     
-    btn.addEventListener('mouseup', (e) => {
-      btn.classList.remove('active');
-      if (onRelease) onRelease();
-    });
-    
+    btn.addEventListener('mouseup', handleRelease);
     btn.addEventListener('mouseleave', (e) => {
-      if (btn.classList.contains('active')) {
-        btn.classList.remove('active');
-        if (onRelease) onRelease();
-      }
+      if (btn.classList.contains('active')) handleRelease();
     });
+  }
+  
+  // ==================== PAUSE BUTTON ====================
+  setupPauseButton() {
+    if (!this.btnPause) return;
+    
+    const handlePause = () => {
+      this.socket?.emit('togglePause');
+      this.triggerHaptic(50);
+    };
+    
+    this.btnPause.addEventListener('click', handlePause);
+    this.btnPause.addEventListener('touchstart', (e) => {
+      e.preventDefault();
+      handlePause();
+    }, { passive: false });
   }
   
   // ==================== SOCKET ====================
   setupSocket() {
     if (typeof io === 'undefined') {
-      console.warn('Socket.IO not available');
+      console.error('Socket.IO not available');
       this.showError('Connection failed');
       return;
     }
     
     this.socket = io();
     
+    // Connection events
     this.socket.on('connect', () => {
-      console.log('Connected to server');
+      console.log('📡 Connected to server');
     });
     
+    this.socket.on('disconnect', () => {
+      console.log('📡 Disconnected from server');
+      this.isConnected = false;
+      this.updateConnectionStatus(false);
+    });
+    
+    // Room events
     this.socket.on('joined', (data) => {
-      console.log('Joined room:', data.roomCode);
+      console.log('🎮 Joined room:', data.roomCode);
       this.isConnected = true;
       this.showController();
       this.triggerHaptic(100);
     });
     
     this.socket.on('ready', (data) => {
-      console.log('Ready to play in room:', data.roomCode);
+      console.log('🎮 Ready in room:', data.roomCode);
       this.isConnected = true;
       this.showController();
     });
     
+    this.socket.on('error', (data) => {
+      console.error('❌ Socket error:', data.message);
+      this.showError(data.message || 'Room not found');
+      this.triggerHaptic(200);
+    });
+    
+    // Game events
     this.socket.on('gameStart', () => {
-      console.log('Game started!');
+      console.log('🏁 Game started!');
       this.triggerHaptic(150);
     });
     
+    this.socket.on('gameEnded', (data) => {
+      console.log('🏁 Game over!');
+      this.showGameOver(data?.score || 0);
+    });
+    
+    this.socket.on('gameReset', () => {
+      console.log('🔄 Game reset');
+      this.hideGameOver();
+      this.controlState.nitroAmount = this.maxNitro;
+      this.updateNitroUI();
+    });
+    
+    // HUD updates from game
     this.socket.on('updateAmmo', (data) => {
-      this.updateAmmo(data.ammo);
+      if (this.ammoCount) {
+        this.ammoCount.textContent = data.ammo;
+      }
     });
     
     this.socket.on('updateNitro', (data) => {
-      this.updateNitro(data.nitro);
+      // External nitro update (from game state sync)
+      if (typeof data.nitro === 'number') {
+        this.controlState.nitroAmount = data.nitro;
+        this.updateNitroUI();
+      }
     });
     
     // Nitro refill from power-up
     this.socket.on('nitroRefill', () => {
+      console.log('⛽ Nitro refilled!');
       this.controlState.nitroAmount = this.maxNitro;
-      if (this.n2oFill) {
-        this.n2oFill.style.width = '100%';
-      }
+      this.updateNitroUI();
       this.triggerHaptic(100);
+      
+      // Immediately sync to game
+      this.sendControl({});
     });
     
-    this.socket.on('error', (data) => {
-      console.error('Socket error:', data.message);
-      this.showError(data.message || 'Room not found');
-    });
-    
-    this.socket.on('disconnect', () => {
-      console.log('Disconnected from server');
-      this.isConnected = false;
+    // Hit confirmation for feedback
+    this.socket.on('hitConfirm', () => {
+      this.triggerHaptic(80);
     });
   }
   
   joinRoom(code) {
     if (this.socket && code) {
+      console.log('🔗 Joining room:', code);
       this.socket.emit('joinRoom', { roomCode: code });
     }
   }
   
   // ==================== CONTROL SENDING ====================
   sendControl(payload) {
-    // Log for debugging
-    console.log('Control:', payload);
+    if (!this.socket || !this.isConnected) return;
     
-    // Send via socket if connected
-    if (this.socket && this.isConnected) {
-      // Build input object for the game
-      const input = {
-        steering: payload.steering ?? this.controlState.steerX,
-        nitro: payload.nitro ?? this.controlState.nitro,
-        drift: payload.drift ?? this.controlState.drift
-      };
-      
-      this.socket.emit('input', input);
-    }
+    // Build complete input object
+    const input = {
+      steering: payload.steering ?? this.controlState.steering,
+      nitro: payload.nitro ?? this.controlState.nitro,
+      nitroAmount: payload.nitroAmount ?? this.controlState.nitroAmount,
+      gun: payload.gun ?? this.controlState.gun
+    };
+    
+    this.socket.emit('input', input);
   }
   
-  // ==================== HUD UPDATES ====================
-  updateAmmo(ammo) {
-    if (this.ammoCount) {
-      this.ammoCount.textContent = ammo;
-    }
-  }
-  
-  updateNitro(nitroPercent) {
-    if (this.n2oFill) {
-      this.n2oFill.style.width = `${nitroPercent}%`;
-    }
-  }
-  
-  updateFuel(fuelPercent) {
-    if (this.fuelFill) {
-      this.fuelFill.style.width = `${fuelPercent}%`;
-    }
-    if (this.fuelPercent) {
-      this.fuelPercent.textContent = `${Math.round(fuelPercent)}%`;
+  // ==================== UI UPDATES ====================
+  updateConnectionStatus(connected) {
+    if (this.connectionStatus) {
+      if (connected) {
+        this.connectionStatus.classList.add('connected');
+        this.connectionStatus.querySelector('.status-text').textContent = 'CONNECTED';
+      } else {
+        this.connectionStatus.classList.remove('connected');
+        this.connectionStatus.querySelector('.status-text').textContent = 'DISCONNECTED';
+      }
     }
   }
   
@@ -407,26 +528,6 @@ class ArcadeController {
     if (navigator.vibrate) {
       navigator.vibrate(duration);
     }
-  }
-  
-  // ==================== PREVENT DEFAULTS ====================
-  preventDefaults() {
-    // Prevent scrolling and zooming on the controller
-    document.addEventListener('touchmove', (e) => {
-      if (e.target.closest('#controller-root')) {
-        e.preventDefault();
-      }
-    }, { passive: false });
-    
-    // Prevent double-tap zoom
-    document.addEventListener('dblclick', (e) => {
-      e.preventDefault();
-    });
-    
-    // Prevent context menu
-    document.addEventListener('contextmenu', (e) => {
-      e.preventDefault();
-    });
   }
 }
 

@@ -2,89 +2,138 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>Just Drift - Controller</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="theme-color" content="#0a0a0f">
+  <title>JUST DRIFT - Controller</title>
+  
+  <!-- Preconnect for faster font loading -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  
+  <!-- 8-bit pixel font -->
   <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="styles.css">
+  
+  <!-- Favicon -->
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🎮</text></svg>">
+  
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <!-- Portrait Warning -->
-  <div id="rotate-warning">
-    <div class="rotate-content">
-      <div class="phone-icon">📱</div>
-      <div class="rotate-arrow">↻</div>
-      <p>ROTATE YOUR PHONE</p>
-      <p class="sub">Landscape mode required</p>
-    </div>
-  </div>
-
-  <!-- Join Screen -->
-  <div id="join-screen" class="screen-overlay">
-    <div class="join-container">
-      <h1 class="join-title">🏎️ JUST DRIFT</h1>
-      <p class="join-subtitle">Enter Room Code</p>
-      <input type="text" id="room-input" class="room-input" maxlength="4" placeholder="----" autocomplete="off">
-      <button id="join-btn" class="join-btn">JOIN GAME</button>
-      <p id="error-msg" class="error-msg"></p>
-    </div>
-  </div>
-
-  <!-- Main Controller -->
-  <div id="controller-root" class="arcade-frame hidden">
-    <!-- Scanline Overlay -->
-    <div class="scanlines"></div>
-    
-    <!-- Controls Container -->
-    <div class="controls-container">
-      
-      <!-- LEFT SIDE: Steering Buttons -->
-      <div class="steering-zone">
-        <button id="btn-left" class="steer-btn">
-          <span class="steer-icon">◀</span>
-          <span class="steer-label">LEFT</span>
-        </button>
-        <button id="btn-right" class="steer-btn">
-          <span class="steer-icon">▶</span>
-          <span class="steer-label">RIGHT</span>
-        </button>
+  <!-- Scanline overlay for CRT effect -->
+  <div class="scanlines"></div>
+  
+  <!-- ========== JOIN SCREEN ========== -->
+  <div id="join-screen" class="screen">
+    <div class="join-content">
+      <div class="join-header">
+        <div class="controller-icon">🎮</div>
+        <h1 class="join-title">JUST DRIFT</h1>
+        <p class="join-subtitle">CONTROLLER</p>
       </div>
       
-      <!-- RIGHT SIDE: Action Buttons + HUD -->
-      <div class="action-zone">
-        <!-- Counters + Pause -->
-        <div class="counters">
-          <div class="counter ammo-counter">
-            <span class="counter-label">AMMO</span>
-            <span class="counter-value" id="ammo-count">50</span>
-          </div>
-          <div class="counter nitro-counter">
-            <span class="counter-label">N2O</span>
-            <div class="nitro-bar">
-              <div class="nitro-fill" id="n2o-fill"></div>
-            </div>
-          </div>
-          <button id="btn-pause" class="pause-btn-small">⏸</button>
+      <div class="join-form">
+        <label class="input-label">ENTER ROOM CODE</label>
+        <div class="code-input-container">
+          <input 
+            type="text" 
+            id="room-input" 
+            class="code-input" 
+            maxlength="4" 
+            placeholder="----"
+            autocomplete="off"
+            autocapitalize="characters"
+            spellcheck="false"
+          >
+          <div class="input-glow"></div>
         </div>
         
-        <!-- Action Buttons -->
-        <div class="action-buttons">
-          <button id="btn-gun" class="action-btn fire-btn">
-            <span class="btn-icon">🔫</span>
-            <span class="btn-label">FIRE</span>
-          </button>
-          <button id="btn-nitro" class="action-btn nitro-btn">
-            <span class="btn-icon">🔥</span>
-            <span class="btn-label">NITRO</span>
-          </button>
-        </div>
+        <button id="join-btn" class="arcade-btn join-btn">
+          <span class="btn-icon">▶</span>
+          <span class="btn-text">JOIN GAME</span>
+        </button>
+        
+        <p id="error-msg" class="error-text"></p>
       </div>
       
+      <div class="join-footer">
+        <p class="hint-text">Look at the display screen for room code</p>
+      </div>
     </div>
   </div>
-
+  
+  <!-- ========== CONTROLLER SCREEN ========== -->
+  <div id="controller-screen" class="screen hidden">
+    <!-- Top HUD Bar -->
+    <div class="controller-hud">
+      <div class="hud-stats">
+        <div class="stat-item">
+          <span class="stat-label">AMMO</span>
+          <span id="ammo-count" class="stat-value ammo">50</span>
+        </div>
+        <div class="stat-item nitro-stat">
+          <span class="stat-label">N2O</span>
+          <div class="nitro-bar">
+            <div id="n2o-fill" class="nitro-fill"></div>
+          </div>
+        </div>
+      </div>
+      <button id="btn-pause" class="pause-btn">⏸</button>
+    </div>
+    
+    <!-- Control Area -->
+    <div class="control-area">
+      <!-- Left Side: Steering Buttons -->
+      <div class="steering-zone">
+        <button id="btn-left" class="steer-btn steer-left">
+          <span class="steer-arrow">◀</span>
+        </button>
+        <button id="btn-right" class="steer-btn steer-right">
+          <span class="steer-arrow">▶</span>
+        </button>
+      </div>
+      
+      <!-- Right Side: Action Buttons -->
+      <div class="action-zone">
+        <button id="btn-gun" class="action-btn fire-btn">
+          <span class="btn-emoji">🔫</span>
+          <span class="btn-label">FIRE</span>
+        </button>
+        <button id="btn-nitro" class="action-btn nitro-btn">
+          <span class="btn-emoji">⚡</span>
+          <span class="btn-label">NITRO</span>
+        </button>
+      </div>
+    </div>
+    
+    <!-- Connection Status -->
+    <div id="connection-status" class="connection-indicator connected">
+      <span class="status-dot"></span>
+      <span class="status-text">CONNECTED</span>
+    </div>
+    
+    <!-- Game Over Overlay -->
+    <div id="gameover-overlay" class="gameover-overlay hidden">
+      <div class="gameover-content">
+        <div class="police-flash">
+          <span class="flash-light red"></span>
+          <span class="flash-light blue"></span>
+        </div>
+        <h1 class="gameover-title">BUSTED!</h1>
+        <p class="gameover-score">SCORE: <span id="controller-score">0</span></p>
+        <button id="btn-retry" class="arcade-btn retry-btn">
+          <span class="btn-icon">🔄</span>
+          <span class="btn-text">RETRY</span>
+        </button>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Socket.IO -->
   <script src="/socket.io/socket.io.js"></script>
+  
+  <!-- Controller Logic -->
   <script src="controller.js"></script>
 </body>
 </html>
