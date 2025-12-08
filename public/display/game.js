@@ -362,9 +362,10 @@ class Game {
         this.roomCode = response.roomCode;
         this.roomCodeDisplay.textContent = this.roomCode;
         
-        const url = `${window.location.origin}/controller`;
-        this.controllerUrlDisplay.textContent = url;
-        this.generateQRCode(url + `?room=${this.roomCode}`);
+        const controllerUrl = `${window.location.origin}/controller`;
+        const homeUrl = `${window.location.origin}`;
+        this.controllerUrlDisplay.textContent = controllerUrl;
+        this.generateQRCode(homeUrl + `?room=${this.roomCode}`);
         
         this.showScreen('waiting');
       }
@@ -427,15 +428,24 @@ class Game {
     const qrContainer = document.getElementById('qr-code');
     qrContainer.innerHTML = '';
     
+    console.log('Generating QR code for URL:', url);
+    
     if (typeof QRCode !== 'undefined') {
-      const canvas = document.createElement('canvas');
-      QRCode.toCanvas(canvas, url, {
-        width: 128,
-        margin: 2,
-        color: { dark: '#000000', light: '#ffffff' }
-      }, (error) => {
-        if (!error) qrContainer.appendChild(canvas);
-      });
+      try {
+        new QRCode(qrContainer, {
+          text: url,
+          width: 128,
+          height: 128,
+          colorDark: '#000000',
+          colorLight: '#ffffff',
+          correctLevel: QRCode.CorrectLevel.M
+        });
+        console.log('QR Code generated successfully');
+      } catch (error) {
+        console.error('QR Code generation error:', error);
+      }
+    } else {
+      console.error('QRCode library not loaded');
     }
   }
   
@@ -1616,6 +1626,6 @@ class Game {
 }
 
 // ==================== INITIALIZE ====================
-window.addEventListener('DOMContentLoaded', () => {
+window.addEventListener('load', () => {
   window.game = new Game();
 });
